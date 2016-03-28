@@ -61,7 +61,7 @@
                    | set its name to something other than its default name (typically the simple class name).
                    -->
                 <entry key-ref="proxyAuthenticationHandler" value-ref="proxyPrincipalResolver" />
-                <entry key-ref="dbAuthenticationHandler" value-ref="primaryPrincipalResolver" />
+                <entry key-ref="dbAuthenticationHandler" value-ref="principalResolver" />
             </map>
         </constructor-arg>
 
@@ -111,15 +111,18 @@
        | Resolves a principal from a credential using an attribute repository that is configured to resolve
        | against a deployer-specific store (e.g. LDAP).
        -->
+    <!--
     <bean id="primaryPrincipalResolver"
           class="org.jasig.cas.authentication.principal.PersonDirectoryPrincipalResolver"
           p:principalFactory-ref="principalFactory"
           p:attributeRepository-ref="attributeRepository" />
+          -->
 
     <!--
     Bean that defines the attributes that a service may return.  This example uses the Stub/Mock version.  A real implementation
     may go against a database or LDAP server.  The id should remain "attributeRepository" though.
     +-->
+    <!--
     <bean id="attributeRepository" class="org.jasig.services.persondir.support.NamedStubPersonAttributeDao"
           p:backingMap-ref="attrRepoBackingMap" />
 
@@ -136,6 +139,7 @@
             </list>
         </entry>
     </util:map>
+          -->
 
     <bean id="serviceRegistryDao" class="org.jasig.cas.services.JsonServiceRegistryDao"
           c:configDirectory="${service.registry.config.location:classpath:services}" />
@@ -191,4 +195,28 @@
           p:dataSource-ref="dataSource"
           p:passwordEncoder-ref="passwordEncoder"
           p:sql="${cas.jdbc.authn.query.sql}" />
+
+    <bean id="singleRowJdbcPersonAttributeDao" class="org.jasig.services.persondir.support.jdbc.SingleRowJdbcPersonAttributeDao">
+        <constructor-arg index="0" ref="dataSource" />
+        <constructor-arg index="1" value="SELECT * FROM users WHERE {0}" />
+        <property name="queryAttributeMapping">
+            <map>
+                <entry key="username" value="username" />
+            </map>
+        </property>
+        <property name="resultAttributeMapping">
+            <map>
+                <entry key="username" value="username" />
+                <entry key="first_name" value="first_name" />
+                <entry key="last_name" value="last_name" />
+                <entry key="role" value="role" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="principalResolver"
+          class="org.jasig.cas.authentication.principal.PersonDirectoryPrincipalResolver"
+          p:principalAttributeName="username"
+          p:attributeRepository-ref="singleRowJdbcPersonAttributeDao"
+          p:returnNullIfNoAttributes="true" />
 </beans>
