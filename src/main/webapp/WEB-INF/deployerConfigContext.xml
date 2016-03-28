@@ -37,13 +37,15 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:p="http://www.springframework.org/schema/p"
        xmlns:c="http://www.springframework.org/schema/c"
+       xmlns:cas="http://unicon.net/schema/cas"
        xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:sec="http://www.springframework.org/schema/security"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
        http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
-       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+       http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+       http://unicon.net/schema/cas http://unicon.net/schema/cas/cas-addons.xsd">
 
     <!--
        | The authentication manager defines security policy for authentication by specifying at a minimum
@@ -141,8 +143,13 @@
     </util:map>
           -->
 
+
     <bean id="serviceRegistryDao" class="org.jasig.cas.services.JsonServiceRegistryDao"
           c:configDirectory="${service.registry.config.location:classpath:services}" />
+
+<!--
+    <cas:json-services-registry/>
+-->
 
     <bean id="auditTrailManager" class="org.jasig.inspektr.audit.support.Slf4jLoggingAuditTrailManager" />
 
@@ -162,6 +169,7 @@
               p:serviceTicketCountWarnThreshold="5000"
               p:sessionCountWarnThreshold="100000" />
     </util:list>
+
 
     <bean id="dataSource"
           class="com.mchange.v2.c3p0.ComboPooledDataSource"
@@ -219,4 +227,6 @@
           p:principalAttributeName="username"
           p:attributeRepository-ref="singleRowJdbcPersonAttributeDao"
           p:returnNullIfNoAttributes="true" />
+
+
 </beans>
