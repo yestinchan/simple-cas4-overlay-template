@@ -62,8 +62,10 @@
                    | If more than one instance of the same handler class is configured, you must explicitly
                    | set its name to something other than its default name (typically the simple class name).
                    -->
+
                 <entry key-ref="proxyAuthenticationHandler" value-ref="proxyPrincipalResolver" />
-                <entry key-ref="dbAuthenticationHandler" value-ref="principalResolver" />
+
+                <entry key-ref="dbAuthenticationHandler" value-ref="primaryPrincipalResolver" />
             </map>
         </constructor-arg>
 
@@ -215,14 +217,25 @@
         <property name="resultAttributeMapping">
             <map>
                 <entry key="username" value="username" />
-                <entry key="first_name" value="first_name" />
-                <entry key="last_name" value="last_name" />
+                <entry key="firstname" value="firstname" />
+                <entry key="lastname" value="lastname" />
                 <entry key="role" value="role" />
             </map>
         </property>
     </bean>
 
-    <bean id="principalResolver"
+    <bean id="attributeRepository" class="org.jasig.services.persondir.support.StubPersonAttributeDao">
+        <property name="backingMap">
+            <map>
+                <entry key="uid" value="username"/>
+                <entry key="eduPersonAffiliation" value="affiliation"/>
+                <entry key="member" value="member"/>
+            </map>
+        </property>
+    </bean>
+
+
+    <bean id="primaryPrincipalResolver"
           class="org.jasig.cas.authentication.principal.PersonDirectoryPrincipalResolver"
           p:principalAttributeName="username"
           p:attributeRepository-ref="singleRowJdbcPersonAttributeDao"
